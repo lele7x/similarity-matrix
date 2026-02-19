@@ -30,7 +30,8 @@ class SimilarityMatrix:
                  name: str,
                  row_load_function: callable = None,
                  column_load_function: callable = None,
-                 matrix: Optional[np.ndarray] = None):
+                 matrix: Optional[np.ndarray] = None,
+                 model_name: str = "jinaai/jina-embeddings-v3"):
         """
         Initialize the SymilarityMatrix.
 
@@ -40,7 +41,8 @@ class SimilarityMatrix:
             name: Name of the matrix (used for file saving)
             row_load_function: Function to load rows given the row IDs
             column_load_function: Function to load columns given the column IDs
-            matrix: Optional pre-computed matrix. If None, creates empty matrix.
+            matrix: Optional pre-computed matrix. If None, creates empty matrix
+            model_name: The name of the SentenceTransformer model to initialize.
         """
         self.row_ids = list(row_ids)
         self.column_ids = list(column_ids)
@@ -69,6 +71,9 @@ class SimilarityMatrix:
             # Initialize empty matrix with zeros
             self.matrix = np.zeros(
                 (len(row_ids), len(column_ids)), dtype=float)
+            
+        # Store the model name for later use
+        self.model_name = model_name
 
         # These values are updated automatically right before matrix computation
         # do not set them manually! They are private for a reason
@@ -82,7 +87,8 @@ class SimilarityMatrix:
             column_ids: list,
             name: str,
             row_load_function: callable = None,
-            column_load_function: callable = None):
+            column_load_function: callable = None,
+            model_name: str = "jinaai/jina-embeddings-v3"):
         """
         Create an empty SymilarityMatrix with just the row and column lists.
 
@@ -90,6 +96,7 @@ class SimilarityMatrix:
             row_ids: List of row IDs
             column_ids: List of column IDs
             name: Name of the matrix
+            model_name: The name of the SentenceTransformer model to initialize.
 
         Returns:
             SymilarityMatrix instance with zero-initialized matrix
@@ -99,7 +106,8 @@ class SimilarityMatrix:
             column_ids,
             name,
             row_load_function,
-            column_load_function)
+            column_load_function,
+            model_name=model_name)
 
     def calculate(self, fake: int | None = None) -> None:
         """
@@ -117,7 +125,7 @@ class SimilarityMatrix:
             return
 
         # Initialize the embedding model
-        model = initialize_model()
+        model = initialize_model(model_name=self.model_name)
 
         # Load row and column data using the passed functions
         row_texts = self.row_load_function()
@@ -196,13 +204,14 @@ class SimilarityMatrix:
 
     @classmethod
     def load(cls, directory_path: Union[str, Path],
-             name: str) -> 'SimilarityMatrix':
+             name: str, model_name: str = "jinaai/jina-embeddings-v3") -> 'SimilarityMatrix':
         """
         Load the matrix and indices from files in the specified directory.
 
         Args:
             directory_path: Directory path where files are located
             name: Name of the matrix files to load
+            model_name: The name of the SentenceTransformer model to initialize.
 
         Returns:
             SymilarityMatrix instance loaded from files
@@ -227,7 +236,7 @@ class SimilarityMatrix:
         row_ids = indices_data['row_ids']
         column_ids = indices_data['column_ids']
 
-        return cls(row_ids, column_ids, loaded_name, matrix=matrix)
+        return cls(row_ids, column_ids, loaded_name, matrix=matrix, model_name=model_name)
 
     def get_value(self, row_id: str, column_id: str) -> float:
         """
@@ -295,7 +304,8 @@ class SimilarityMatrix:
             name=self.name,
             matrix=normalize_array(self.matrix, min_v, max_v),
             row_load_function=self.row_load_function,
-            column_load_function=self.column_load_function)
+            column_load_function=self.column_load_function,
+            model_name=self.model_name)
 
     @property
     def shape(self) -> tuple:

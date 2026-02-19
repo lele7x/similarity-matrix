@@ -29,6 +29,7 @@ class ChunkedSimilarityMatrix(SimilarityMatrix):
                  row_load_function: callable = None,
                  column_load_function: callable = None,
                  matrix: Optional[np.ndarray] = None,
+                 model_name: str = "jinaai/jina-embeddings-v3",
                  row_chunk_size: int = 100,
                  column_chunk_size: int = 100,
                  temp_dir: Optional[Union[str, Path]] = None):
@@ -42,12 +43,13 @@ class ChunkedSimilarityMatrix(SimilarityMatrix):
             row_load_function: Function to load row data
             column_load_function: Function to load column data
             matrix: Optional pre-computed matrix
+            model_name: The name of the SentenceTransformer model to initialize
             row_chunk_size: Number of rows to process at once
             column_chunk_size: Number of columns to process at once
             temp_dir: Directory for temporary files (uses system temp if None)
         """
         super().__init__(row_ids, column_ids, name, row_load_function,
-                         column_load_function, matrix)
+                         column_load_function, matrix, model_name)
 
         self.row_chunk_size = row_chunk_size
         self.column_chunk_size = column_chunk_size
@@ -66,7 +68,7 @@ class ChunkedSimilarityMatrix(SimilarityMatrix):
             return
 
         # Initialize the embedding model
-        model = initialize_model()
+        model = initialize_model(model_name=self.model_name)
 
         # Load row and column data using the passed functions
         row_texts = self.row_load_function()

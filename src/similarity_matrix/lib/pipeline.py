@@ -59,12 +59,14 @@ class Pipeline(ABC):
             name: str,
             db: Database,
             path: str = './matrices',
-            chunk_size: int | None = None):
+            chunk_size: int | None = None,
+            model_name: str = "jinaai/jina-embeddings-v3",):
         self.name = name
         self.db = db
         self.path = path
         self.chunk_size = chunk_size
         self._sm = None
+        self.model_name = model_name
 
         if not os.path.isdir(self.path):
             os.mkdir(self.path)
@@ -140,6 +142,7 @@ class Pipeline(ABC):
                 name=self.name,
                 row_load_function=self.get_row_values,
                 column_load_function=self.get_column_values,
+                model_name=self.model_name,
                 row_chunk_size=self.chunk_size,
                 column_chunk_size=self.chunk_size)
         else:
@@ -149,7 +152,8 @@ class Pipeline(ABC):
                 column_ids=self.get_column_ids(),
                 name=self.name,
                 row_load_function=self.get_row_values,
-                column_load_function=self.get_column_values)
+                column_load_function=self.get_column_values,
+                model_name=self.model_name)
 
     def get_matrix(self) -> SimilarityMatrix:
         """
