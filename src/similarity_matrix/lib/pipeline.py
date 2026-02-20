@@ -60,13 +60,13 @@ class Pipeline(ABC):
             db: Database,
             path: str = './matrices',
             chunk_size: int | None = None,
-            model_name: str = "jinaai/jina-embeddings-v3",):
+            model_name: str | None = None):
         self.name = name
         self.db = db
         self.path = path
         self.chunk_size = chunk_size
         self._sm = None
-        self.model_name = model_name
+        self.model_name = model_name if model_name is not None else os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3')
 
         if not os.path.isdir(self.path):
             os.mkdir(self.path)

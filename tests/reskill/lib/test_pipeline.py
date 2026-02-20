@@ -164,7 +164,8 @@ class TestPipeline:
             column_ids=[10, 20, 30],
             name=pipeline.name,
             row_load_function=pipeline.get_row_values,
-            column_load_function=pipeline.get_column_values
+            column_load_function=pipeline.get_column_values,
+            model_name=pipeline.model_name
         )
 
         # Verify the matrix was calculated and saved

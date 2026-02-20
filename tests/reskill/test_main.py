@@ -483,6 +483,7 @@ class TestIntegration:
             '--db-name', 'test_db',
             '--db-user', 'test_user',
             '--db-password', 'test_pass',
+            '--model-name', 'test-model',
             '--pipeline-dir', 'test/pipelines',
             '--output-dir', 'test/output',
             '--pipeline', 'test_pipeline',
@@ -508,7 +509,8 @@ class TestIntegration:
                 mock_pipeline_constructor.assert_called_once_with(
                     name='test_pipeline',
                     db=mock_db,
-                    path='test/output'
+                    path='test/output',
+                    model_name='test-model'
                 )
                 mock_pipeline_instance.update_db_row_table.assert_called_once()
 

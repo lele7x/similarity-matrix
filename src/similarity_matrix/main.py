@@ -74,6 +74,11 @@ def main():
         default=os.environ.get('DB_PASSWORD'),
         help='database password (can be passed through .env DB_PASSWORD)')
     parser.add_argument(
+        '--model-name',
+        metavar='MODEL_NAME',
+        default=os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3'),
+        help='the name of the model to use for the similarity calculation (default: jinaai/jina-embeddings-v3, can be passed through .env MODEL_NAME)')
+    parser.add_argument(
         '--pipeline-dir',
         default='./pipelines',
         help='path to the directory containing all pipelines (default: ./pipelines)')
@@ -194,6 +199,7 @@ def main():
         name=args.pipeline,
         db=db,
         path=args.output_dir,
+        model_name=args.model_name
     )
 
     # ---------------------------------------

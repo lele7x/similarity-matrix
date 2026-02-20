@@ -1,9 +1,12 @@
+import os
 import json
 import pytest
 import numpy as np
 from unittest.mock import patch, MagicMock
 from similarity_matrix.lib.matrix import SimilarityMatrix
 from similarity_matrix.lib.matrix_chunk import ChunkedSimilarityMatrix
+from similarity_matrix.lib.pipeline import Pipeline
+from similarity_matrix.lib.database import Database
 
 @pytest.fixture
 def basic_ids():
@@ -15,6 +18,46 @@ def fake_load_functions():
         lambda: ["text1"],
         lambda: ["text2"]
     )
+
+class ConcretePipeline(Pipeline):
+    """Concrete implementation of Pipeline for testing purposes."""
+
+    def __init__(
+            self, 
+            name: str, 
+            db: Database, 
+            path: str = './matrices', 
+            chunk_size: int | None = None,
+            model_name: str = os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3')):
+        super().__init__(name, db, path, chunk_size=chunk_size, model_name=model_name)
+        self.row_ids = [1, 2, 3]
+        self.column_ids = [10, 20, 30]
+        self.row_values = ["text1", "text2", "text3"]
+        self.column_values = ["textA", "textB", "textC"]
+
+    def get_row_ids(self) -> list:
+        return self.row_ids
+
+    def get_column_ids(self) -> list:
+        return self.column_ids
+
+    def get_row_values(self) -> list[str]:
+        return self.row_values
+
+    def get_column_values(self) -> list[str]:
+        return self.column_values
+
+    def update_db_row_table(self):
+        # Just mock method
+        pass
+
+    def update_db_column_table(self):
+        # Just mock method
+        pass
+
+    def update_db_matrix_table(self):
+        # Just mock method
+        pass
 
 class TestModelName:
     ## --------------------------------------------------------------
@@ -232,3 +275,58 @@ class TestModelName:
         matrix.calculate()
 
         mock_initialize.assert_called_once_with(model_name="test-model")
+
+    ## --------------------------------------------------------------
+    ## Pipiline model_name tests
+    ## --------------------------------------------------------------
+
+    def test_pipeline_model_name_stored(self):
+        db_mock = MagicMock()
+        pipeline = ConcretePipeline(
+            name="test",
+            db=db_mock,
+            model_name="test-model"
+        )
+
+        assert pipeline.model_name == "test-model"
+
+    def test_pipeline_default_model_name(self):
+        db_mock = MagicMock()
+        pipeline = ConcretePipeline(
+            name="test",
+            db=db_mock
+        )
+
+        assert pipeline.model_name == "jinaai/jina-embeddings-v3"
+
+    @patch("similarity_matrix.lib.pipeline.SimilarityMatrix.create_empty")
+    def test_pipeline_passes_model_name_to_similarity_matrix(self, mock_create):
+        db_mock = MagicMock()
+
+        pipeline = ConcretePipeline(
+            name="test",
+            db=db_mock,
+            model_name="test-model"
+        )
+
+        pipeline.chunk_size = None
+        pipeline._init_matrix()
+
+        _, kwargs = mock_create.call_args
+        assert kwargs["model_name"] == "test-model"
+
+    @patch("similarity_matrix.lib.pipeline.ChunkedSimilarityMatrix")
+    def test_pipeline_passes_model_name_to_chunked_matrix(self, mock_chunked):
+        db_mock = MagicMock()
+
+        pipeline = ConcretePipeline(
+            name="test",
+            db=db_mock,
+            model_name="test-model",
+            chunk_size=10
+        )
+
+        pipeline._init_matrix()
+
+        _, kwargs = mock_chunked.call_args
+        assert kwargs["model_name"] == "test-model"

@@ -1,5 +1,6 @@
 import numpy as np
 import json
+import os
 from typing import List, Optional, Union
 from pathlib import Path
 
@@ -31,7 +32,7 @@ class SimilarityMatrix:
                  row_load_function: callable = None,
                  column_load_function: callable = None,
                  matrix: Optional[np.ndarray] = None,
-                 model_name: str = "jinaai/jina-embeddings-v3"):
+                 model_name: str | None = None):
         """
         Initialize the SymilarityMatrix.
 
@@ -73,7 +74,7 @@ class SimilarityMatrix:
                 (len(row_ids), len(column_ids)), dtype=float)
             
         # Store the model name for later use
-        self.model_name = model_name
+        self.model_name = model_name if model_name is not None else os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3')
 
         # These values are updated automatically right before matrix computation
         # do not set them manually! They are private for a reason
@@ -88,7 +89,7 @@ class SimilarityMatrix:
             name: str,
             row_load_function: callable = None,
             column_load_function: callable = None,
-            model_name: str = "jinaai/jina-embeddings-v3"):
+            model_name: str | None = None):
         """
         Create an empty SymilarityMatrix with just the row and column lists.
 
@@ -107,7 +108,7 @@ class SimilarityMatrix:
             name,
             row_load_function,
             column_load_function,
-            model_name=model_name)
+            model_name= model_name if model_name is not None else os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3'))
 
     def calculate(self, fake: int | None = None) -> None:
         """
@@ -203,8 +204,10 @@ class SimilarityMatrix:
         logger.debug(f"Saved indices to {indices_path}")
 
     @classmethod
-    def load(cls, directory_path: Union[str, Path],
-             name: str, model_name: str = "jinaai/jina-embeddings-v3") -> 'SimilarityMatrix':
+    def load(cls, 
+             directory_path: Union[str, Path],
+             name: str, 
+             model_name: str = os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3')) -> 'SimilarityMatrix':
         """
         Load the matrix and indices from files in the specified directory.
 
