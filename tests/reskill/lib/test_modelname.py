@@ -280,6 +280,7 @@ class TestModelName:
     ## Pipiline model_name tests
     ## --------------------------------------------------------------
 
+    # Verify that model_name is stored in the Pipeline
     def test_pipeline_model_name_stored(self):
         db_mock = MagicMock()
         pipeline = ConcretePipeline(
@@ -290,6 +291,8 @@ class TestModelName:
 
         assert pipeline.model_name == "test-model"
 
+    # Verify that if no model_name is provided, the Pipeline assigns 
+    # the default value
     def test_pipeline_default_model_name(self):
         db_mock = MagicMock()
         pipeline = ConcretePipeline(
@@ -299,6 +302,8 @@ class TestModelName:
 
         assert pipeline.model_name == "jinaai/jina-embeddings-v3"
 
+    # Verify that when a Pipeline is initialized, it passes the model_name
+    # to the SimilarityMatrix it creates (when chunk_size is None)
     @patch("similarity_matrix.lib.pipeline.SimilarityMatrix.create_empty")
     def test_pipeline_passes_model_name_to_similarity_matrix(self, mock_create):
         db_mock = MagicMock()
@@ -315,6 +320,8 @@ class TestModelName:
         _, kwargs = mock_create.call_args
         assert kwargs["model_name"] == "test-model"
 
+    # Verify that when a Pipeline is initialized, it passes the model_name
+    # to the ChunkedSimilarityMatrix it creates (when chunk_size is set)
     @patch("similarity_matrix.lib.pipeline.ChunkedSimilarityMatrix")
     def test_pipeline_passes_model_name_to_chunked_matrix(self, mock_chunked):
         db_mock = MagicMock()
