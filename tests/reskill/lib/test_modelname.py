@@ -28,7 +28,7 @@ class ConcretePipeline(Pipeline):
             db: Database, 
             path: str = './matrices', 
             chunk_size: int | None = None,
-            model_name: str = os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3')):
+            model_name: str = 'jinaai/jina-embeddings-v3'):
         super().__init__(name, db, path, chunk_size=chunk_size, model_name=model_name)
         self.row_ids = [1, 2, 3]
         self.column_ids = [10, 20, 30]

@@ -66,7 +66,7 @@ class Pipeline(ABC):
         self.path = path
         self.chunk_size = chunk_size
         self._sm = None
-        self.model_name = model_name if model_name is not None else os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3')
+        self.model_name = model_name if model_name is not None else 'jinaai/jina-embeddings-v3'
 
         if not os.path.isdir(self.path):
             os.mkdir(self.path)

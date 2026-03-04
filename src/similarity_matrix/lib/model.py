@@ -40,7 +40,7 @@ def get_model_size(model, float_bit=32):
 
 
 def initialize_model(
-        model_name: str = os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3'),
+        model_name: str = 'jinaai/jina-embeddings-v3',
         use_cuda: bool = True,
         force_sentence_transformer: bool = False,
         **kwargs) -> SentenceTransformer:

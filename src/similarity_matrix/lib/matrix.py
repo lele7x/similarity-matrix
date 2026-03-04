@@ -74,7 +74,7 @@ class SimilarityMatrix:
                 (len(row_ids), len(column_ids)), dtype=float)
             
         # Store the model name for later use
-        self.model_name = model_name if model_name is not None else os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3')
+        self.model_name = model_name if model_name is not None else 'jinaai/jina-embeddings-v3'
 
         # These values are updated automatically right before matrix computation
         # do not set them manually! They are private for a reason
@@ -108,7 +108,7 @@ class SimilarityMatrix:
             name,
             row_load_function,
             column_load_function,
-            model_name= model_name if model_name is not None else os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3'))
+            model_name= model_name if model_name is not None else 'jinaai/jina-embeddings-v3')
 
     def calculate(self, fake: int | None = None) -> None:
         """
@@ -207,7 +207,7 @@ class SimilarityMatrix:
     def load(cls, 
              directory_path: Union[str, Path],
              name: str, 
-             model_name: str = os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3')) -> 'SimilarityMatrix':
+             model_name: str | None = None) -> 'SimilarityMatrix':
         """
         Load the matrix and indices from files in the specified directory.
 

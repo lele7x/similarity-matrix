@@ -29,7 +29,7 @@ class ChunkedSimilarityMatrix(SimilarityMatrix):
                  row_load_function: callable = None,
                  column_load_function: callable = None,
                  matrix: Optional[np.ndarray] = None,
-                 model_name: str = os.environ.get('MODEL_NAME', 'jinaai/jina-embeddings-v3'),
+                 model_name: str = 'jinaai/jina-embeddings-v3',
                  row_chunk_size: int = 100,
                  column_chunk_size: int = 100,
                  temp_dir: Optional[Union[str, Path]] = None):
